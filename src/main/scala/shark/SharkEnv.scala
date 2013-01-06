@@ -54,6 +54,14 @@ object SharkEnv extends LogHelper {
         executorEnvVars)
   }
 
+  def initWithSharkContext(newSc: SharkContext) {
+    if (sc != null) {
+      sc.stop
+    }
+
+    sc = newSc
+  }
+
   logInfo("Initializing SharkEnv")
 
   System.setProperty("spark.serializer", classOf[spark.KryoSerializer].getName)

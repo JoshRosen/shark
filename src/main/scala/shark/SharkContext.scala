@@ -73,6 +73,7 @@ class SharkContext(
 
       val results = new ArrayList[String]()
       driver.run(cmd)
+      driver.setMaxRows(Int.MaxValue)
       driver.getResults(results)
       driver.destroy()
       results
