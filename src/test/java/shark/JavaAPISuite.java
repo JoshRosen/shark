@@ -70,4 +70,23 @@ public class JavaAPISuite implements Serializable {
         Assert.assertEquals(500, values.count());
         Assert.assertTrue(values.collect().contains("val_407"));
     }
+
+    @Test
+    public void nullValuesInRowWrapper() {
+        // Test case for SHARK-119: "Null values can cause NullPointerExceptions in RowWrapper"
+        // This file contains rows with null keys and values:
+        String dataFilePath = System.getenv("HIVE_DEV_HOME") + "/data/files/kv3.txt";
+        sc.sql("create table shark_nullValuesInRowWrapper(key int, val string)");
+        sc.sql("load data local inpath '" + dataFilePath + "' overwrite into table shark_nullValuesInRowWrapper");
+
+        JavaTableRDD result = sc.sql2rdd("select * from shark_nullValuesInRowWrapper");
+        JavaRDD<String> values = result.mapRows(new Function<RowWrapper, String>() {
+            @Override
+            public String call(RowWrapper x) {
+                return x.getInt("key") + ":" + x.getString("val");
+            }
+        });
+        Assert.assertEquals(25, values.count());
+        Assert.assertTrue(values.collect().contains("311:val_311"));
+    }
 }
